@@ -5,3 +5,4 @@ package-lock.json
 .nyc_output
 lib-es2016
 es5.sh
+es6.sh
