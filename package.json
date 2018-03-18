@@ -19,12 +19,13 @@
     "bson": "^1.0.4",
     "int53": "^0.2.4",
     "lzo": "^0.4.0",
+    "node-etl": "^1.0.3",
     "object-stream": "0.0.1",
+    "quick-lru": "^1.1.0",
     "snappyjs": "^0.6.0",
     "streamz": "^1.8.5",
     "thrift": "^0.10.0",
-    "varint": "^5.0.0",
-    "quick-lru": "^1.1.0"
+    "varint": "^5.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
