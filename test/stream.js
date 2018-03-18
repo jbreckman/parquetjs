@@ -44,7 +44,7 @@ describe('PathStreamer', function() {
             num_rows: 5,
             pageData: { // mock purposes only
               quantity: [[20],[17,15],[30,18]],
-              name: []
+              name: [['nick', 'nolte', 'other', 'thomas', 'zane']]
             }
           }
         ]
@@ -259,6 +259,81 @@ describe('PathStreamer', function() {
     assert.equal(results.length, 2);
     assert.deepEqual(results[0], {quantity: 25, name: 'dallas'});
     assert.deepEqual(results[1], {quantity: 25, name: 'miles' });
+  });
+
+  it('can load fields with no filter', async function() {
+    let spec = {
+      fields: [
+        { path: 'quantity' },
+        { path: 'name' },
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.deepEqual(results, [
+      { quantity: 20, name: 'abbot' },
+      { quantity: 25, name: 'dallas' },
+      { quantity: 29, name: 'bilbo' },
+      { quantity: 30, name: 'charles' },
+      { quantity: 29, name: 'josh' },
+      { quantity: 25, name: 'miles' },
+      { quantity: 20, name: 'nick' },
+      { quantity: 17, name: 'nolte' },
+      { quantity: 15, name: 'other' },
+      { quantity: 30, name: 'thomas' },
+      { quantity: 18, name: 'zane' }
+    ]);
+  });
+
+
+  it('can do post filter', async function() {
+    let spec = {
+      fields: [
+        { path: 'quantity' },
+        { path: 'name' },
+      ],
+      post: [
+        { type: 'filter', script: d => d.name.length === 4 }
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.deepEqual(results, [
+      { quantity: 29, name: 'josh' },
+      { quantity: 20, name: 'nick' },
+      { quantity: 18, name: 'zane' }
+    ]);
+  });
+
+  it('can do post transform and filter', async function() {
+    let spec = {
+      fields: [
+        { path: 'quantity' },
+        { path: 'name' },
+      ],
+      post: [
+        { type: 'transform', script: d => 
+          {
+            d.name = d.name + d.name;
+            return d;
+          } 
+        },
+        { type: 'filter', script: d => d.name.length === 8 }
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.deepEqual(results, [
+      { quantity: 29, name: 'joshjosh' },
+      { quantity: 20, name: 'nicknick' },
+      { quantity: 18, name: 'zanezane' }
+    ]);
   });
 
 });
