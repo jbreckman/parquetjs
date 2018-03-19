@@ -5,6 +5,7 @@ const parquet = require('../parquet.js');
 const PathStreamer = require('../lib/pathStreamer');
 
 describe('PathStreamer', function() {
+  let READER_ID = 1;
 
   function mockColumn(path, minValue, maxValue, startingIndices, minValues, maxValues) {
     return {
@@ -29,6 +30,7 @@ describe('PathStreamer', function() {
 
   function mockReader() {
     let result = {
+      id: READER_ID++,
       metadata: {
         row_groups: [
           {
