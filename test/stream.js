@@ -51,7 +51,7 @@ describe('PathStreamer', function() {
       },
       readOffsetIndex: column => Promise.resolve(column.offsetIndex),
       readColumnIndex: column => Promise.resolve(column.columnIndex),
-      readPage: (column, pageIndex) => Promise.resolve(column._pageData[pageIndex])
+      readFlatPage: (column, pageIndex) => Promise.resolve(column._pageData[pageIndex])
     };
     result.metadata.row_groups.forEach(rowGroup => {
       rowGroup.columns.forEach(column => {
@@ -154,6 +154,53 @@ describe('PathStreamer', function() {
     assert.equal(results[1].rowGroup.num_rows, 5);
     assert.equal(results[1].lowIndex, 3);
     assert.equal(results[1].highIndex, 4);
+  });
+
+
+  it('or base case', async function() {
+    let spec = {
+      filter: [
+        { or: [{ path: 'quantity', value: 25 },
+               { path: 'name', value: 'abbot'},
+               { path: 'name', value: 'dallas'}] }
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.equal(results.length, 3);
+    assert.equal(results[0].rowGroup.num_rows, 6);
+    assert.equal(results[0].lowIndex, 1);
+    assert.equal(results[0].highIndex, 1);
+    assert.equal(results[1].rowGroup.num_rows, 6);
+    assert.equal(results[1].lowIndex, 0);
+    assert.equal(results[1].highIndex, 0);
+    assert.equal(results[2].rowGroup.num_rows, 6);
+    assert.equal(results[2].lowIndex, 5);
+    assert.equal(results[2].highIndex, 5);
+    
+  });
+
+  it('or - harder case', async function() {
+    let spec = {
+      filter: [
+        { or: [{ path: 'quantity', value: 25 },
+               { path: 'name', min: 'bilbo', max: 'miles'}] }
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.equal(results.length, 2);
+    assert.equal(results[0].rowGroup.num_rows, 6);
+    assert.equal(results[0].lowIndex, 1);
+    assert.equal(results[0].highIndex, 1);
+    assert.equal(results[1].rowGroup.num_rows, 6);
+    assert.equal(results[1].lowIndex, 2);
+    assert.equal(results[1].highIndex, 5);
+    
   });
 
 
