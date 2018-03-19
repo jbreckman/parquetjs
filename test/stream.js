@@ -51,11 +51,12 @@ describe('PathStreamer', function() {
       },
       readOffsetIndex: column => Promise.resolve(column.offsetIndex),
       readColumnIndex: column => Promise.resolve(column.columnIndex),
-      readFlatPage: (column, pageIndex) => Promise.resolve(column._pageData[pageIndex])
+      readFlatPage: (offset, pageIndex) => Promise.resolve(offset.column._pageData[pageIndex])
     };
     result.metadata.row_groups.forEach(rowGroup => {
       rowGroup.columns.forEach(column => {
         column._pageData = rowGroup.pageData[column.meta_data.path_in_schema.join('.')];
+        column.offsetIndex.column = column;
       });
     });
     return result;
