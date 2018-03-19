@@ -160,6 +160,49 @@ describe('PathStreamer', function() {
   });
 
 
+  it('reader statistics winnowing - in hits', async function() {
+    let spec = {
+      filter: [
+        { path: 'quantity', in: [21, 25], index: true }
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.equal(results.length, 2);
+    assert.equal(results[0].rowGroup.num_rows, 6);
+    assert.equal(results[0].lowIndex, 0);
+    assert.equal(results[0].highIndex, 5);
+    assert.equal(results[1].rowGroup.num_rows, 5);
+    assert.equal(results[1].lowIndex, 3);
+    assert.equal(results[1].highIndex, 4);
+  });
+
+  it('reader winnowing - in hits', async function() {
+    let spec = {
+      filter: [
+        { path: 'quantity', in: [20, 25] }
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.equal(results.length, 3);
+    assert.equal(results[0].rowGroup.num_rows, 6);
+    assert.equal(results[0].lowIndex, 0);
+    assert.equal(results[0].highIndex, 1);
+    assert.equal(results[1].rowGroup.num_rows, 6);
+    assert.equal(results[1].lowIndex, 5);
+    assert.equal(results[1].highIndex, 5);
+    assert.equal(results[2].rowGroup.num_rows, 5);
+    assert.equal(results[2].lowIndex, 0);
+    assert.equal(results[2].highIndex, 0);
+  });
+
+
+
   it('or base case', async function() {
     let spec = {
       filter: [
