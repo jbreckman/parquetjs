@@ -25,7 +25,8 @@
     "snappyjs": "^0.6.0",
     "streamz": "^1.8.5",
     "thrift": "^0.10.0",
-    "varint": "^5.0.0"
+    "varint": "^5.0.0",
+    "bloomfilter": "github:jbreckman/bloomfilter.js#bulk"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

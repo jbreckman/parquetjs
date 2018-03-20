@@ -429,4 +429,24 @@ describe('PathStreamer', function() {
     ]);
   });
 
+
+  it('reader statistics winnowing - bloom', async function() {
+    let spec = {
+      filter: [
+        { path: 'quantity', bloom: 20 }
+      ]
+    }
+    
+    let pathStreamer = new PathStreamer(spec, [mockReader()]);
+    let results = await pathStreamer.stream.promise();
+
+    assert.equal(results.length, 2);
+    assert.equal(results[0].rowGroup.num_rows, 6);
+    assert.equal(results[0].lowIndex, 0);
+    assert.equal(results[0].highIndex, 3);
+    assert.equal(results[1].rowGroup.num_rows, 5);
+    assert.equal(results[1].lowIndex, 0);
+    assert.equal(results[1].highIndex, 0);
+  });
+
 });
